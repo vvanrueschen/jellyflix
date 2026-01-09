@@ -10,6 +10,8 @@ class DownloadScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final downloads = ref.watch(downloadsStreamProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -32,16 +34,16 @@ class DownloadScreen extends HookConsumerWidget {
           ],
         ),
       ),
-      body: FutureBuilder(
-        future: ref.read(getDownloadsProvider),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+      body: downloads.when(
+        data: (data) {
+          if (data.isNotEmpty) {
             return ListView.builder(
-              itemCount: snapshot.data!.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
                 return DownloadItemTile(
-                    itemId: snapshot.data![index],
-                    parentBranch: ScreenPaths.downloads);
+                  itemId: data[index],
+                  parentBranch: ScreenPaths.downloads,
+                );
               },
             );
           } else {
@@ -50,6 +52,8 @@ class DownloadScreen extends HookConsumerWidget {
             );
           }
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Error: $error')),
       ),
     );
   }

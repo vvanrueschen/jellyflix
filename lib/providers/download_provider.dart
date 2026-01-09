@@ -20,3 +20,15 @@ final cancelAndDeleteDownloadProvider = Provider(
 final downloadProgressProvider = StreamProvider.autoDispose
     .family<int?, String>((ref, itemId) =>
         ref.read(downloadProvider(itemId)).downloadProgress(1));
+
+final downloadsStreamProvider = StreamProvider.autoDispose<List<String>>((ref) async* {
+  final downloadedItems = await DownloadService.getDownloadedItems();
+  yield downloadedItems;
+
+  yield* DownloadService.getDownloadsStream().map((activeDownloads) {
+    return {
+      ...downloadedItems,
+      ...activeDownloads,
+    }.toList();
+  });
+});
