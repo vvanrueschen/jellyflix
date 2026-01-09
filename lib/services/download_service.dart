@@ -848,4 +848,10 @@ class DownloadService {
         content: Text(AppLocalizations.of(navigatorKey.currentContext!)!
             .allDownloadsRemoved)));
   }
+
+  static Stream<List<String>> getDownloadsStream() {
+    return Stream.periodic(const Duration(seconds: 1), (_) {
+      return _instances.keys.toList();
+    });
+  }
 }
